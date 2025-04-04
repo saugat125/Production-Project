@@ -1,0 +1,5 @@
+python ModelRun.py "{\"symptoms\": [\"abdominal_pain\",\"shivering\",\"chills\",\"watering_from_eyes\",\"continuous_sneeezing\"]}"
+
+python ModelRun.py "{\"symptoms\": [\"acidity\",\"indigestion\",\"headache\",\"blurred_and_distorted_vision\",\"irritability\"]}" 
+
+python ModelRun.py "{\"symptoms\": [\"itching\",\"vomiting\",\"fatigue\",\"yellowish_skin\",\"abdominal_pain\",\"dark_urine\"]}" 
