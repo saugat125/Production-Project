@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 
 class UserManager(BaseUserManager):
-    def create_user(self, email, name, age=None, gender=None, role='PATIENT', blood_group=None, password=None):
+    def create_user(self, email, name, age=None, gender=None, role='PATIENT', blood_group=None, password=None, password2=None):
         """
         Creates a normal user (not admin).
         """
