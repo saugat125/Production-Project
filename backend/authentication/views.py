@@ -4,10 +4,12 @@ from rest_framework.views import APIView
 from authentication.serializers import UserRegistrationSerializer
 from authentication.serializers import UserLoginSerializer
 from django.contrib.auth import authenticate
+from authentication.renderers import UserRenderer
 
 # Create your views here.
 
 class UserRegistrationView(APIView):
+    renderer_classes = [UserRenderer]
     def post(self, request, format=None):
         serializer = UserRegistrationSerializer(data=request.data)
 
@@ -19,6 +21,7 @@ class UserRegistrationView(APIView):
     
 
 class UserLoginView(APIView):
+    renderer_classes = [UserRenderer]
     def post(self, request, format=None):
 
         serializer = UserLoginSerializer(data=request.data)
