@@ -2,8 +2,11 @@ import { useForm } from "react-hook-form"
 import { Link } from "react-router-dom"
 import axios from 'axios';
 import { getBaseURL } from "../apiConfig";
+import { useState } from "react";
 
 export default function Login() {
+  const[error,setError] = useState(false)
+
   const {
     register,
     handleSubmit,
@@ -22,6 +25,7 @@ export default function Login() {
     
     catch(err){
       console.error(err)
+      setError(err.response.data.errors.non_field_errors[0])
     }
 
   }
@@ -41,6 +45,7 @@ export default function Login() {
             <p className="text-sm text-gray-600 md:text-base">Enter your credentials to login to your account</p>
           </div>
 
+          {error && <p className="text-red-500 text-center mb-4">{error}</p>}
           <div className="form">
             <form onSubmit={handleSubmit(onSubmit)}>
               {/* Email */}

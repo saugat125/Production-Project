@@ -8,6 +8,7 @@ export default function Signup() {
     register,
     handleSubmit,
     watch,
+    setError,
     formState: { errors },
   } = useForm()
 
@@ -16,7 +17,8 @@ export default function Signup() {
   const onSubmit = async (data) => {
     console.log(data)
     // Handle signup logic here
-    const response = await axios.post(`${getBaseURL()}/user/register/`, {
+    try{
+      const response = await axios.post(`${getBaseURL()}/user/register/`, {
       email: data.email,
       name: data.name,
       age: +data.age,
@@ -28,6 +30,15 @@ export default function Signup() {
     localStorage.setItem('token', response.data.token.access);
     localStorage.setItem('refreshToken', response.data.token.refresh);
     window.location.href = '/';
+    }
+    catch(err){
+      console.error(err)
+      setError("email", {
+        type: "manual",
+        message: err.response.data.errors.email[0],
+      })
+    }
+    
   }
 
   return (
