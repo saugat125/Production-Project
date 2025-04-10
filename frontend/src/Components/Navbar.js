@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom"
 
 function Navbar(){
+    const isAuthenticated = localStorage.getItem('token')
+
     return (
       <div className="navigation">
         <div className="header flex justify-between mx-[100px] mt-[30px]">
@@ -21,10 +23,16 @@ function Navbar(){
               Doctors
             </Link>
           </div>
-          <div className="header-item flex gap-10">
+          { (!isAuthenticated)?(
+            <div className="header-item flex gap-10">
             <Link to="/signup">Signup</Link>
             <Link to="/login">Login</Link>
           </div>
+          ):
+          <p>user</p>
+            
+          }
+
         </div>
       </div>
     );
