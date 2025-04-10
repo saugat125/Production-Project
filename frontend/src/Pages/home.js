@@ -1,6 +1,7 @@
 import Navbar from "../Components/Navbar";
 import Footer from "../Components/Footer";
 import { Link } from "react-router-dom";
+import TestimonialsSection from "../Components/testimonial";
 
 function Home() {
   return (
@@ -153,6 +154,9 @@ function Home() {
           </div>
         </div>
       </section>
+
+      {/* Testimonial */}
+      <TestimonialsSection />
 
       {/* Footer */}
       <div className="footer">
