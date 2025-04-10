@@ -32,7 +32,7 @@ export default function Login() {
         <div className="mx-auto max-w-lg rounded-3xl border bg-[linear-gradient(to_bottom,#c3f1fc,#FFFFFF)] px-6 py-10 shadow-custom sm:px-10 md:px-14 md:py-14">
           <div className="mb-6 flex justify-center">
             <div className="relative h-16 w-16">
-              <img src="/placeholder.svg?height=64&width=64" alt="Logo" fill className="object-contain" />
+              <img src="/images/in.png" alt="Logo" fill className="object-contain" />
             </div>
           </div>
 
@@ -46,7 +46,7 @@ export default function Login() {
               {/* Email */}
               <div className="mb-4 relative">
                 <div className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5">
-                  <img src="/placeholder.svg?height=20&width=20" alt="Email icon" width={20} height={20} />
+                  <img src="/images/email.png" alt="Email icon" />
                 </div>
                 <input
                   type="email"
@@ -68,7 +68,7 @@ export default function Login() {
               {/* Password */}
               <div className="mb-4 relative">
                 <div className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5">
-                  <img src="/placeholder.svg?height=20&width=20" alt="Password icon" width={20} height={20} />
+                  <img src="/images/password.png" alt="Password icon" width={20} height={20} />
                 </div>
                 <input
                   type="password"
@@ -108,7 +108,7 @@ export default function Login() {
             {/* Signup */}
             <div className="mt-8 text-center text-sm">
               Don&apos;t have an account yet?
-              <Link href="/signup" className="ml-1 font-semibold hover:underline">
+              <Link to="/signup" className="ml-1 font-semibold hover:underline">
                 Sign Up
               </Link>
             </div>

@@ -1,120 +1,202 @@
-import { Link } from "react-router-dom";
+import axios from "axios"
+import { useForm } from "react-hook-form"
+import { getBaseURL } from "../apiConfig"
+import { Link } from "react-router-dom"
 
-function Signup(){
-    return (
-      <div className="signup-page bg-[linear-gradient(to_bottom,#b6ddf2,#f2f6fc)]">
-        <section className="signup-section">
-          <div className="login-container pt-10 pb-14">
-            <div className="main-container max-w-lg mx-auto rounded-3xl shadow-custom border px-14 py-10 bg-[linear-gradient(to_bottom,#c3f1fc,#FFFFFF)]">
-              <div className="image-container mb-4 flex justify-center">
-                <img src="/images/in.png" alt="" className="w-16 h-16" />
-              </div>
-              <div className="text-container mb-10 text-center">
-                <h3 className="mb-1">Create your account</h3>
-                <p>Enter your credientials to create a new account</p>
-              </div>
-              {/* Form */}
-              <div className="form">
-                <form>
-                  {/* Name */}
-                  <div className="name mb-4 relative">
-                    <div className="logo absolute left-3 top-1/2 transform -translate-y-1/2">
-                      <img src="images/name.png" alt="" />
-                    </div>
-                    <input
-                      type="text"
-                      name="name"
-                      placeholder="Full Name"
-                      className="w-full p-2 pl-12 border border-[#a3a3a3] rounded-lg"
-                      required
-                    />
-                  </div>
-                  {/* Email */}
-                  <div className="email mb-4 relative">
-                    <div className="logo absolute left-3 top-1/2 transform -translate-y-1/2">
-                      <img src="images/email.png" alt="" />
-                    </div>
-                    <input
-                      type="email"
-                      name="email"
-                      placeholder="Email"
-                      className="w-full p-2 pl-12 border border-[#a3a3a3] rounded-lg"
-                      required
-                    />
-                  </div>
-                  {/* Password */}
-                  <div className="password mb-4 relative">
-                    <div className="logo absolute left-3 top-1/2 transform -translate-y-1/2 ">
-                      <img src="images/password.png" alt="" />
-                    </div>
-                    <input
-                      type="password"
-                      name="password"
-                      placeholder="Password"
-                      className="w-full p-2 pl-12 border border-[#a3a3a3] rounded-lg"
-                      required
-                    />
-                  </div>
-                  <div className="confirm-password mb-4 relative">
-                    <div className="logo absolute left-3 top-1/2 transform -translate-y-1/2 ">
-                      <img src="images/password.png" alt="" />
-                    </div>
-                    <input
-                      type="password"
-                      name="confirm_password"
-                      placeholder="Confirm Password"
-                      className="w-full p-2 pl-12 border border-[#a3a3a3] rounded-lg"
-                      required
-                    />
-                  </div>
-                  {/* Age */}
-                  <div className="Age mb-4 relative">
-                    <div className="logo absolute left-3 top-1/2 transform -translate-y-1/2 ">
-                      <img src="images/age.png" alt="" />
-                    </div>
-                    <input
-                      type="text"
-                      name="age"
-                      placeholder="Age"
-                      className="w-full p-2 pl-12 border border-[#a3a3a3] rounded-lg"
-                      required
-                    />
-                  </div>
-                  {/* Gender */}
-                  <div className="gender mb-6 relative">
-                    <div className="logo absolute left-3 top-1/2 transform -translate-y-1/2 ">
-                      <img src="images/name.png" alt="" />
-                    </div>
-                    <select className="w-full p-2 pl-12 border border-[#a3a3a3] rounded-lg text-gray-400">
-                      <option value="">Gender</option>
-                      <option value="male" className="text-black">
-                        Male
-                      </option>
-                      <option value="female" className="text-black">
-                        Female
-                      </option>
-                    </select>
-                  </div>
-                  {/* Button */}
-                  <div className="button">
-                    <button type="submit" className="black-button rounded-xl">
-                      Sign Up
-                    </button>
-                  </div>
-                </form>
-                {/* Login */}
-                <div className="signup text-center mt-8 text-sm">
-                  Already have an account?
-                  <Link to="/login" className="font-semibold ml-1">
-                    Login
-                  </Link>
-                </div>
-              </div>
+export default function Signup() {
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm()
+
+  const password = watch("password")
+
+  const onSubmit = async (data) => {
+    console.log(data)
+    // Handle signup logic here
+    const response = await axios.post(`${getBaseURL()}/user/register/`, {
+      email: data.email,
+      name: data.name,
+      age: +data.age,
+      gender: data.gender,
+      password: data.password,
+      password2: data.password2,
+    });
+
+    localStorage.setItem('token', response.data.token.access);
+    localStorage.setItem('refreshToken', response.data.token.refresh);
+    window.location.href = '/';
+  }
+
+  return (
+    <div className="min-h-screen w-full bg-[linear-gradient(to_bottom,#b6ddf2,#f2f6fc)]">
+      <section className="px-4 py-8 md:py-10">
+        <div className="mx-auto max-w-lg rounded-3xl border bg-[linear-gradient(to_bottom,#c3f1fc,#FFFFFF)] px-6 py-8 shadow-custom sm:px-10 md:px-14 md:py-10">
+          <div className="mb-4 flex justify-center">
+            <div className="relative h-16 w-16">
+              <img src="/images/in.png" alt="Logo" fill className="object-contain" />
             </div>
           </div>
-        </section>
-      </div>
-    );
-}
 
-export default Signup;
+          <div className="mb-6 text-center md:mb-10">
+            <h3 className="mb-1 text-xl font-semibold md:text-2xl">Create your account</h3>
+            <p className="text-sm text-gray-600 md:text-base">Enter your credentials to create a new account</p>
+          </div>
+
+          <div className="form">
+            <form onSubmit={handleSubmit(onSubmit)}>
+              {/* Name */}
+              <div className="mb-4 relative">
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5">
+                  <img src="/images/name.png" alt="Name icon" width={20} height={20} />
+                </div>
+                <input
+                  type="text"
+                  placeholder="Full Name"
+                  className={`w-full rounded-lg border p-2 pl-12 ${
+                    errors.name ? "border-red-500" : "border-[#a3a3a3]"
+                  }`}
+                  {...register("name", { required: "Full name is required" })}
+                />
+                {errors.name && <p className="mt-1 text-xs text-red-500">{errors.name.message}</p>}
+              </div>
+
+              {/* Email */}
+              <div className="mb-4 relative">
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5">
+                  <img src="/images/email.png" alt="Email icon" width={20} height={20} />
+                </div>
+                <input
+                  type="email"
+                  placeholder="Email"
+                  className={`w-full rounded-lg border p-2 pl-12 ${
+                    errors.email ? "border-red-500" : "border-[#a3a3a3]"
+                  }`}
+                  {...register("email", {
+                    required: "Email is required",
+                    pattern: {
+                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                      message: "Invalid email address",
+                    },
+                  })}
+                />
+                {errors.email && <p className="mt-1 text-xs text-red-500">{errors.email.message}</p>}
+              </div>
+
+              {/* Password */}
+              <div className="mb-4 relative">
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5">
+                  <img src="/images/password.png" alt="Password icon" width={20} height={20} />
+                </div>
+                <input
+                  type="password"
+                  placeholder="Password"
+                  className={`w-full rounded-lg border p-2 pl-12 ${
+                    errors.password ? "border-red-500" : "border-[#a3a3a3]"
+                  }`}
+                  {...register("password", {
+                    required: "Password is required",
+                    minLength: {
+                      value: 6,
+                      message: "Password must be at least 6 characters",
+                    },
+                  })}
+                />
+                {errors.password && <p className="mt-1 text-xs text-red-500">{errors.password.message}</p>}
+              </div>
+
+              {/* Confirm Password */}
+              <div className="mb-4 relative">
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5">
+                  <img src="/images/password.png" alt="Password icon" width={20} height={20} />
+                </div>
+                <input
+                  type="password"
+                  placeholder="Confirm Password"
+                  className={`w-full rounded-lg border p-2 pl-12 ${
+                    errors.password2 ? "border-red-500" : "border-[#a3a3a3]"
+                  }`}
+                  {...register("password2", {
+                    required: "Please confirm your password",
+                    validate: (value) => value === password || "Passwords do not match",
+                  })}
+                />
+                {errors.password2 && (
+                  <p className="mt-1 text-xs text-red-500">{errors.password2.message}</p>
+                )}
+              </div>
+
+              {/* Age */}
+              <div className="mb-4 relative">
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5">
+                  <img src="/images/age.png" alt="Age icon" width={20} height={20} />
+                </div>
+                <input
+                  type="number"
+                  placeholder="Age"
+                  className={`w-full rounded-lg border p-2 pl-12 ${errors.age ? "border-red-500" : "border-[#a3a3a3]"}`}
+                  {...register("age", {
+                    required: "Age is required",
+                    min: {
+                      value: 13,
+                      message: "You must be at least 13 years old",
+                    },
+                    max: {
+                      value: 120,
+                      message: "Please enter a valid age",
+                    },
+                  })}
+                />
+                {errors.age && <p className="mt-1 text-xs text-red-500">{errors.age.message}</p>}
+              </div>
+
+              {/* Gender */}
+              <div className="mb-6 relative">
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5">
+                  <img src="/images/name.png" alt="Gender icon" width={20} height={20} />
+                </div>
+                <select
+                  className={`w-full rounded-lg border p-2 pl-12 ${
+                    errors.gender ? "border-red-500" : "border-[#a3a3a3]"
+                  } ${!watch("gender") ? "text-gray-400" : "text-black"}`}
+                  {...register("gender", { required: "Please select your gender" })}
+                >
+                  <option value="" className="text-gray-400">
+                    Gender
+                  </option>
+                  <option value="M" className="text-black">
+                    Male
+                  </option>
+                  <option value="F" className="text-black">
+                    Female
+                  </option>
+                </select>
+                {errors.gender && <p className="mt-1 text-xs text-red-500">{errors.gender.message}</p>}
+              </div>
+
+              {/* Button */}
+              <div>
+                <button
+                  type="submit"
+                  className="w-full rounded-xl bg-black py-2.5 text-white transition-colors hover:bg-gray-800"
+                >
+                  Sign Up
+                </button>
+              </div>
+            </form>
+
+            {/* Login */}
+            <div className="mt-8 text-center text-sm">
+              Already have an account?
+              <Link to="/login" className="ml-1 font-semibold hover:underline">
+                Login
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  )
+}
