@@ -12,6 +12,9 @@ def predict(request):
 
     result = predict_disease(symptoms)
 
+    if "error" in result:
+        return JsonResponse({"error": result["error"]}, status=400)
+
     return JsonResponse(result)
 
 

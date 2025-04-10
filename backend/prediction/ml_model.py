@@ -13,7 +13,12 @@ with open("../ML Model/unique_symptoms_list.csv", "r") as f:
 def predict_disease(symptoms):
     if len(symptoms) < 5:
         return {"error": "Please provide at least 5 symptoms."}
-
+    
+    # Check if all input symptoms are in the list of all symptoms
+    invalid_symptoms = [symptom for symptom in symptoms if symptom not in all_symptoms]
+    if invalid_symptoms:
+        return {"error": f"The following symptoms are not recognized: {', '.join(invalid_symptoms)}"}
+    
     # Prepare input data
     input_data = {symptom: (1 if symptom in symptoms else 0) for symptom in all_symptoms}
     input_df = pd.DataFrame([input_data])
