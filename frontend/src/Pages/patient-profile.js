@@ -1,38 +1,101 @@
 import Navbar from "../Components/Navbar";
 import ProfieSidebar from "../Components/ProfileSidebar";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { getBaseURL } from "../apiConfig";
 import { format } from 'date-fns';
+import { useForm } from 'react-hook-form';
+import { useQuery,useQueryClient } from '@tanstack/react-query';
 
 function PatientProfle(){
-  const [user, setUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      setIsLoading(true);
+  const queryClient = useQueryClient();
 
-      try {
-        // Fetch user profile data
-        const response = await axios.get(`${getBaseURL()}/user/profile/`, {
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm();
+
+  const {
+    data: user,
+    isLoading: isUserLoading,
+  } = useQuery({
+    queryKey: ['userProfile'],
+    queryFn: async () => {
+      const response = await axios.get(`${getBaseURL()}/user/profile/`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+      return response.data;
+    },
+    onError: (error) => {
+      setError(error.message);
+    },
+  });
+
+  // Query for vitals data
+  const {
+    data: vitals,
+    isLoading: isVitalsLoading,
+  } = useQuery({
+    queryKey: ['userVitals'],
+    queryFn: async () => {
+      console.log('Fetching vitals...');
+      const response = await axios.get(`${getBaseURL()}/user/vital/`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+      console.log('Vitals response:', response.data);
+      return response.data;
+    },
+    onError: (error) => {
+      setError(error.message);
+    },
+  });
+
+  const isLoading = isUserLoading || isVitalsLoading;
+
+
+  const handleEditClick = () => {
+    setIsEditing(true);
+    reset({
+      blood_pressure: vitals?.blood_pressure || '',
+      heart_rate: vitals?.heart_rate || '',
+      temperature: vitals?.temperature || '',
+    });
+  };
+
+  const onSubmit = async (data) => {
+    try {
+      await axios.post(
+        `${getBaseURL()}/user/vital/update/`,
+        data,
+        {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
+            'Content-Type': 'application/json',
           },
-        });
+        }
+      );
 
-        setUser(response.data);
-      } catch (err) {
-        console.error('Error fetching user data:', err);
-        setError('Failed to load user profile. Please try again later.');
-      } finally {
-        setIsLoading(false);
-      }
-    };
+      queryClient.invalidateQueries(['userVitals']); // Invalidate the vitals query to refetch data
 
-    fetchUserData();
-  }, []);
+      setIsEditing(false);
+    } catch (err) {
+      console.error('Error updating vitals:', err);
+      setError('Failed to update vitals. Please try again.');
+    }
+  };
+
+  const handleCancel = () => {
+    setIsEditing(false);
+  };
 
   // Format gender display
   const formatGender = (gender) => {
@@ -165,47 +228,168 @@ function PatientProfle(){
                     </div>
                   </div>
 
+
+
+
                   {/* Vitals Section */}
                   <div className="vitals">
                     <div className="head flex justify-between items-center mb-6">
                       <h3 className="title text-lg font-medium flex items-center ml-2">
                         Patient Current Vitals
-                        <button className="edit-btn ml-4">
-                          <img src="/images/edit.png" alt="" />
-                        </button>
+                        {!isEditing && (
+                          <button
+                            className="edit-btn ml-4"
+                            onClick={handleEditClick}
+                          >
+                            <img src="/images/edit.png" alt="Edit vitals" />
+                          </button>
+                        )}
                       </h3>
-                      <p className="updated text-sm text-gray-600">
-                        Updated on 10 March, 2025
-                      </p>
+                      {vitals?.date_time && (
+                        <p className="updated text-sm text-gray-600">
+                          Updated on {formatDate(vitals.date_time)}
+                        </p>
+                      )}
                     </div>
 
-                    <div className="card grid grid-cols-1 md:grid-cols-3 gap-6">
-                      <div className="item bg-white p-6 rounded-3xl shadow-md border">
-                        <h5 className="font-medium mb-4">Blood Pressure</h5>
-                        <p className="text-2xl font-medium mb-1">
-                          120/80
-                          <span className="text-sm text-gray-500 ml-2">
-                            mmHg
-                          </span>
-                        </p>
+                    {isEditing ? (
+                      <form
+                        onSubmit={handleSubmit(onSubmit)}
+                        className="card bg-white p-6 rounded-3xl shadow-md border"
+                      >
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                          <div className="item">
+                            <label className="block font-medium mb-2">
+                              Blood Pressure
+                            </label>
+                            <input
+                              type="text"
+                              placeholder="e.g. 120/80"
+                              className={`w-full p-2 border rounded ${
+                                errors.blood_pressure
+                                  ? 'border-red-500'
+                                  : 'border-gray-300'
+                              }`}
+                              {...register('blood_pressure', {
+                                pattern: {
+                                  value: /^\d{1,3}\/\d{1,3}$/,
+                                  message: 'Format should be like 120/80',
+                                },
+                              })}
+                            />
+                            {errors.blood_pressure && (
+                              <p className="mt-1 text-xs text-red-500">
+                                {errors.blood_pressure.message}
+                              </p>
+                            )}
+                          </div>
+                          <div className="item">
+                            <label className="block font-medium mb-2">
+                              Heart Rate
+                            </label>
+                            <input
+                              type="number"
+                              placeholder="e.g. 72"
+                              className={`w-full p-2 border rounded ${
+                                errors.heart_rate
+                                  ? 'border-red-500'
+                                  : 'border-gray-300'
+                              }`}
+                              {...register('heart_rate', {
+                                min: {
+                                  value: 30,
+                                  message: 'Heart rate too low',
+                                },
+                                max: {
+                                  value: 200,
+                                  message: 'Heart rate too high',
+                                },
+                              })}
+                            />
+                            {errors.heart_rate && (
+                              <p className="mt-1 text-xs text-red-500">
+                                {errors.heart_rate.message}
+                              </p>
+                            )}
+                          </div>
+                          <div className="item">
+                            <label className="block font-medium mb-2">
+                              Temperature (°F)
+                            </label>
+                            <input
+                              type="number"
+                              step="0.1"
+                              placeholder="e.g. 98.6"
+                              className={`w-full p-2 border rounded ${
+                                errors.temperature
+                                  ? 'border-red-500'
+                                  : 'border-gray-300'
+                              }`}
+                              {...register('temperature', {
+                                min: {
+                                  value: 90,
+                                  message: 'Temperature too low',
+                                },
+                                max: {
+                                  value: 110,
+                                  message: 'Temperature too high',
+                                },
+                              })}
+                            />
+                            {errors.temperature && (
+                              <p className="mt-1 text-xs text-red-500">
+                                {errors.temperature.message}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex justify-end space-x-4">
+                          <button
+                            type="button"
+                            onClick={handleCancel}
+                            className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100"
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            type="submit"
+                            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                          >
+                            Save Changes
+                          </button>
+                        </div>
+                      </form>
+                    ) : (
+                      <div className="card grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="item bg-white p-6 rounded-3xl shadow-md border">
+                          <h5 className="font-medium mb-4">Blood Pressure</h5>
+                          <p className="text-2xl font-medium mb-1">
+                            {vitals?.blood_pressure || '--'}
+                            <span className="text-sm text-gray-500 ml-2">
+                              mmHg
+                            </span>
+                          </p>
+                        </div>
+                        <div className="item bg-white p-6 rounded-3xl shadow-md border">
+                          <h5 className="font-medium mb-4">Heart Rate</h5>
+                          <p className="text-2xl font-medium mb-1">
+                            {vitals?.heart_rate || '--'}
+                            <span className="text-sm text-gray-500 ml-4">
+                              bpm
+                            </span>
+                          </p>
+                        </div>
+                        <div className="item bg-white p-6 rounded-3xl shadow-md border">
+                          <h5 className="font-medium mb-4">Body Temperature</h5>
+                          <p className="text-2xl font-medium mb-1">
+                            {vitals?.temperature || '--'}
+                            <span className="text-sm text-gray-500 ml-4">
+                              F
+                            </span>
+                          </p>
+                        </div>
                       </div>
-                      <div className="item bg-white p-6 rounded-3xl shadow-md border">
-                        <h5 className="font-medium mb-4">Heart Rate</h5>
-                        <p className="text-2xl font-medium mb-1">
-                          72
-                          <span className="text-sm text-gray-500 ml-4">
-                            bpm
-                          </span>
-                        </p>
-                      </div>
-                      <div className="item bg-white p-6 rounded-3xl shadow-md border">
-                        <h5 className="font-medium mb-4">Blood Pressure</h5>
-                        <p className="text-2xl font-medium mb-1">
-                          98.6
-                          <span className="text-sm text-gray-500 ml-4">F</span>
-                        </p>
-                      </div>
-                    </div>
+                    )}
                   </div>
                 </div>
               </div>
