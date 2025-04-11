@@ -53,9 +53,23 @@ class UserLoginView(APIView):
 class UserProfileView(APIView):
     renderer_classes = [UserRenderer]
     permission_classes = [IsAuthenticated]
+
     def get(self,request,format=None):
         serializer = UserProfileSerializer(request.user)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+class UserProfileUpdateView(APIView):
+    def post(self, request, format=None):
+        """Update the current user's profile data"""
+        user = request.user
+        serializer = UserProfileSerializer(user, data=request.data, partial=True)
+        
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'msg':'Profile Updated Successfully'},status=status.HTTP_200_OK)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserChangePasswordView(APIView):
