@@ -39,7 +39,10 @@ function Navbar(){
             <div className="header-item flex gap-8 items-center">
               <div className="user">
                 <Link to="/patient-profile">
-                  <img src="/images/user.png" alt="" className="w-8 h-8" />
+                  <div className="account flex gap-3 items-center">
+                    <img src="/images/user.png" alt="" className="w-6 h-6" />
+                    <p className="text-black">Account</p>
+                  </div>
                 </Link>
               </div>
               <button onClick={logout}>Logout</button>

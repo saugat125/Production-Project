@@ -1,29 +1,36 @@
-import Navbar from "../Components/Navbar";
-import ProfieSidebar from "../Components/ProfileSidebar";
-import axios from "axios";
-import { useState } from "react";
-import { getBaseURL } from "../apiConfig";
+import Navbar from '../Components/Navbar';
+import ProfieSidebar from '../Components/ProfileSidebar';
+import axios from 'axios';
+import { useState } from 'react';
+import { getBaseURL } from '../apiConfig';
 import { format } from 'date-fns';
 import { useForm } from 'react-hook-form';
-import { useQuery,useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
-function PatientProfle(){
+function PatientProfile() {
   const [error, setError] = useState(null);
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditingVitals, setIsEditingVitals] = useState(false);
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
 
   const queryClient = useQueryClient();
 
+  // Form for vitals
   const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
+    register: registerVitals,
+    handleSubmit: handleSubmitVitals,
+    reset: resetVitals,
+    formState: { errors: vitalsErrors },
   } = useForm();
 
+  // Form for profile
   const {
-    data: user,
-    isLoading: isUserLoading,
-  } = useQuery({
+    register: registerProfile,
+    handleSubmit: handleSubmitProfile,
+    reset: resetProfile,
+    formState: { errors: profileErrors },
+  } = useForm();
+
+  const { data: user, isLoading: isUserLoading } = useQuery({
     queryKey: ['userProfile'],
     queryFn: async () => {
       const response = await axios.get(`${getBaseURL()}/user/profile/`, {
@@ -39,10 +46,7 @@ function PatientProfle(){
   });
 
   // Query for vitals data
-  const {
-    data: vitals,
-    isLoading: isVitalsLoading,
-  } = useQuery({
+  const { data: vitals, isLoading: isVitalsLoading } = useQuery({
     queryKey: ['userVitals'],
     queryFn: async () => {
       console.log('Fetching vitals...');
@@ -61,40 +65,69 @@ function PatientProfle(){
 
   const isLoading = isUserLoading || isVitalsLoading;
 
-
-  const handleEditClick = () => {
-    setIsEditing(true);
-    reset({
+  // Vitals edit functions
+  const handleEditVitalsClick = () => {
+    setIsEditingVitals(true);
+    resetVitals({
       blood_pressure: vitals?.blood_pressure || '',
       heart_rate: vitals?.heart_rate || '',
       temperature: vitals?.temperature || '',
     });
   };
 
-  const onSubmit = async (data) => {
+  const onSubmitVitals = async (data) => {
     try {
-      await axios.post(
-        `${getBaseURL()}/user/vital/update/`,
-        data,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-            'Content-Type': 'application/json',
-          },
-        }
-      );
+      await axios.post(`${getBaseURL()}/user/vital/update/`, data, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'application/json',
+        },
+      });
 
       queryClient.invalidateQueries(['userVitals']); // Invalidate the vitals query to refetch data
 
-      setIsEditing(false);
+      setIsEditingVitals(false);
     } catch (err) {
       console.error('Error updating vitals:', err);
       setError('Failed to update vitals. Please try again.');
     }
   };
 
-  const handleCancel = () => {
-    setIsEditing(false);
+  const handleCancelVitals = () => {
+    setIsEditingVitals(false);
+  };
+
+  // Profile edit functions
+  const handleEditProfileClick = () => {
+    setIsEditingProfile(true);
+    resetProfile({
+      name: user?.name || '',
+      age: user?.age || '',
+      gender: user?.gender || '',
+      blood_group: user?.blood_group || '',
+    });
+  };
+
+  const onSubmitProfile = async (data) => {
+    try {
+      await axios.post(`${getBaseURL()}/user/profile/update/`, data, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      queryClient.invalidateQueries(['userProfile']); // Invalidate the profile query to refetch data
+
+      setIsEditingProfile(false);
+    } catch (err) {
+      console.error('Error updating profile:', err);
+      setError('Failed to update profile. Please try again.');
+    }
+  };
+
+  const handleCancelProfile = () => {
+    setIsEditingProfile(false);
   };
 
   // Format gender display
@@ -112,7 +145,6 @@ function PatientProfle(){
       return 'Invalid date';
     }
   };
-
 
   if (isLoading) {
     return (
@@ -142,7 +174,6 @@ function PatientProfle(){
     );
   }
 
-
   return (
     <div>
       <div className="nav">
@@ -162,7 +193,7 @@ function PatientProfle(){
                   <div className="card bg-white rounded-3xl overflow-hidden mb-8 shadow-md border">
                     <div className="flex flex-col md:flex-row gap-10">
                       {/* Left side - Profile */}
-                      <div className=" left-container p-10 pr-20 border-b md:border-b-0 md:border-r border-gray-300 flex flex-col items-center md:items-start">
+                      <div className="left-container p-10 pr-20 border-b md:border-b-0 md:border-r border-gray-300 flex flex-col items-center md:items-start">
                         <div className="image-container w-20 h-20 mb-6">
                           <img
                             src="/images/doctor.png"
@@ -177,69 +208,198 @@ function PatientProfle(){
                           {user?.email}
                         </p>
 
-                        <button className="border border-[#2563EB] text-[#2563EB] rounded-3xl px-5 py-2 text-sm flex items-center space-x-1">
+                        <button
+                          onClick={handleEditProfileClick}
+                          className="border border-[#2563EB] text-[#2563EB] rounded-3xl px-5 py-2 text-sm flex items-center space-x-1"
+                        >
                           <span className="font-semibold">Edit Profile</span>
                         </button>
                       </div>
 
                       {/* Right side - Patient details */}
-                      <div className="details p-10 pt-20 flex-1">
-                        <div className="flex flex-wrap gap-y-10">
-                          <div className="item w-1/3">
-                            <p className="text-md text-gray-500">Gender</p>
-                            <p className="font-medium text-lg">
-                              {formatGender(user?.gender || null)}
-                            </p>
-                          </div>
+                      {isEditingProfile ? (
+                        <div className="details p-10 pt-20 flex-1">
+                          <form onSubmit={handleSubmitProfile(onSubmitProfile)}>
+                            <div className="flex flex-wrap gap-y-10">
+                              <div className="item w-1/3">
+                                <label className="block font-medium mb-2">
+                                  Name
+                                </label>
+                                <input
+                                  type="text"
+                                  className={`w-full p-2 border rounded ${
+                                    profileErrors.name
+                                      ? 'border-red-500'
+                                      : 'border-gray-300'
+                                  }`}
+                                  {...registerProfile('name', {
+                                    required: 'Name is required',
+                                  })}
+                                />
+                                {profileErrors.name && (
+                                  <p className="mt-1 text-xs text-red-500">
+                                    {profileErrors.name.message}
+                                  </p>
+                                )}
+                              </div>
 
-                          <div className="item w-1/3">
-                            <p className="text-md text-gray-500">Age</p>
-                            <p className="font-medium text-lg">
-                              {user?.age || 'Not specified'}
-                            </p>
-                          </div>
+                              <div className="item w-1/3">
+                                <label className="block font-medium mb-2">
+                                  Age
+                                </label>
+                                <input
+                                  type="number"
+                                  className={`w-full p-2 border rounded ${
+                                    profileErrors.age
+                                      ? 'border-red-500'
+                                      : 'border-gray-300'
+                                  }`}
+                                  {...registerProfile('age', {
+                                    min: {
+                                      value: 1,
+                                      message: 'Age must be greater than 0',
+                                    },
+                                    max: {
+                                      value: 120,
+                                      message: 'Age must be less than 120',
+                                    },
+                                  })}
+                                />
+                                {profileErrors.age && (
+                                  <p className="mt-1 text-xs text-red-500">
+                                    {profileErrors.age.message}
+                                  </p>
+                                )}
+                              </div>
 
-                          <div className="item w-1/3">
-                            <p className="text-md text-gray-500">Blood Group</p>
-                            <p className="font-medium text-lg">
-                              {user?.blood_group || 'Not specified'}
-                            </p>
-                          </div>
+                              <div className="item w-1/3">
+                                <label className="block font-medium mb-2">
+                                  Gender
+                                </label>
+                                <select
+                                  className={`w-full p-2 border rounded ${
+                                    profileErrors.gender
+                                      ? 'border-red-500'
+                                      : 'border-gray-300'
+                                  }`}
+                                  {...registerProfile('gender')}
+                                >
+                                  <option value="">Select gender</option>
+                                  <option value="M">Male</option>
+                                  <option value="F">Female</option>
+                                </select>
+                                {profileErrors.gender && (
+                                  <p className="mt-1 text-xs text-red-500">
+                                    {profileErrors.gender.message}
+                                  </p>
+                                )}
+                              </div>
 
-                          <div className="item w-1/3">
-                            <p className="text-md text-gray-500">Status</p>
-                            <p className="font-medium text-lg">
-                              {user?.is_active ? 'Active' : 'Inactive'}
-                            </p>
-                          </div>
+                              <div className="item w-1/3">
+                                <label className="block font-medium mb-2">
+                                  Blood Group
+                                </label>
+                                <select
+                                  className={`w-full p-2 border rounded ${
+                                    profileErrors.blood_group
+                                      ? 'border-red-500'
+                                      : 'border-gray-300'
+                                  }`}
+                                  {...registerProfile('blood_group')}
+                                >
+                                  <option value="">Select blood group</option>
+                                  <option value="A+">A+</option>
+                                  <option value="A-">A-</option>
+                                  <option value="B+">B+</option>
+                                  <option value="B-">B-</option>
+                                  <option value="AB+">AB+</option>
+                                  <option value="AB-">AB-</option>
+                                  <option value="O+">O+</option>
+                                  <option value="O-">O-</option>
+                                </select>
+                                {profileErrors.blood_group && (
+                                  <p className="mt-1 text-xs text-red-500">
+                                    {profileErrors.blood_group.message}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
 
-                          <div className="item w-1/3">
-                            <p className="text-md text-gray-500">
-                              Registered Date
-                            </p>
-                            <p className="font-medium text-lg">
-                              {user?.registered_date
-                                ? formatDate(user.registered_date)
-                                : 'Not available'}
-                            </p>
+                            <div className="flex justify-end space-x-4 mt-10">
+                              <button
+                                type="button"
+                                onClick={handleCancelProfile}
+                                className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100"
+                              >
+                                Cancel
+                              </button>
+                              <button
+                                type="submit"
+                                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                              >
+                                Save Profile
+                              </button>
+                            </div>
+                          </form>
+                        </div>
+                      ) : (
+                        <div className="details p-10 pt-20 flex-1">
+                          <div className="flex flex-wrap gap-y-10">
+                            <div className="item w-1/3">
+                              <p className="text-md text-gray-500">Gender</p>
+                              <p className="font-medium text-lg">
+                                {formatGender(user?.gender || null)}
+                              </p>
+                            </div>
+
+                            <div className="item w-1/3">
+                              <p className="text-md text-gray-500">Age</p>
+                              <p className="font-medium text-lg">
+                                {user?.age || 'Not specified'}
+                              </p>
+                            </div>
+
+                            <div className="item w-1/3">
+                              <p className="text-md text-gray-500">
+                                Blood Group
+                              </p>
+                              <p className="font-medium text-lg">
+                                {user?.blood_group || 'Not specified'}
+                              </p>
+                            </div>
+
+                            <div className="item w-1/3">
+                              <p className="text-md text-gray-500">Status</p>
+                              <p className="font-medium text-lg">
+                                {user?.is_active ? 'Active' : 'Inactive'}
+                              </p>
+                            </div>
+
+                            <div className="item w-1/3">
+                              <p className="text-md text-gray-500">
+                                Registered Date
+                              </p>
+                              <p className="font-medium text-lg">
+                                {user?.registered_date
+                                  ? formatDate(user.registered_date)
+                                  : 'Not available'}
+                              </p>
+                            </div>
                           </div>
                         </div>
-                      </div>
+                      )}
                     </div>
                   </div>
-
-
-
 
                   {/* Vitals Section */}
                   <div className="vitals">
                     <div className="head flex justify-between items-center mb-6">
                       <h3 className="title text-lg font-medium flex items-center ml-2">
                         Patient Current Vitals
-                        {!isEditing && (
+                        {!isEditingVitals && (
                           <button
                             className="edit-btn ml-4"
-                            onClick={handleEditClick}
+                            onClick={handleEditVitalsClick}
                           >
                             <img src="/images/edit.png" alt="Edit vitals" />
                           </button>
@@ -252,9 +412,9 @@ function PatientProfle(){
                       )}
                     </div>
 
-                    {isEditing ? (
+                    {isEditingVitals ? (
                       <form
-                        onSubmit={handleSubmit(onSubmit)}
+                        onSubmit={handleSubmitVitals(onSubmitVitals)}
                         className="card bg-white p-6 rounded-3xl shadow-md border"
                       >
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
@@ -266,20 +426,20 @@ function PatientProfle(){
                               type="text"
                               placeholder="e.g. 120/80"
                               className={`w-full p-2 border rounded ${
-                                errors.blood_pressure
+                                vitalsErrors.blood_pressure
                                   ? 'border-red-500'
                                   : 'border-gray-300'
                               }`}
-                              {...register('blood_pressure', {
+                              {...registerVitals('blood_pressure', {
                                 pattern: {
                                   value: /^\d{1,3}\/\d{1,3}$/,
                                   message: 'Format should be like 120/80',
                                 },
                               })}
                             />
-                            {errors.blood_pressure && (
+                            {vitalsErrors.blood_pressure && (
                               <p className="mt-1 text-xs text-red-500">
-                                {errors.blood_pressure.message}
+                                {vitalsErrors.blood_pressure.message}
                               </p>
                             )}
                           </div>
@@ -291,11 +451,11 @@ function PatientProfle(){
                               type="number"
                               placeholder="e.g. 72"
                               className={`w-full p-2 border rounded ${
-                                errors.heart_rate
+                                vitalsErrors.heart_rate
                                   ? 'border-red-500'
                                   : 'border-gray-300'
                               }`}
-                              {...register('heart_rate', {
+                              {...registerVitals('heart_rate', {
                                 min: {
                                   value: 30,
                                   message: 'Heart rate too low',
@@ -306,9 +466,9 @@ function PatientProfle(){
                                 },
                               })}
                             />
-                            {errors.heart_rate && (
+                            {vitalsErrors.heart_rate && (
                               <p className="mt-1 text-xs text-red-500">
-                                {errors.heart_rate.message}
+                                {vitalsErrors.heart_rate.message}
                               </p>
                             )}
                           </div>
@@ -321,11 +481,11 @@ function PatientProfle(){
                               step="0.1"
                               placeholder="e.g. 98.6"
                               className={`w-full p-2 border rounded ${
-                                errors.temperature
+                                vitalsErrors.temperature
                                   ? 'border-red-500'
                                   : 'border-gray-300'
                               }`}
-                              {...register('temperature', {
+                              {...registerVitals('temperature', {
                                 min: {
                                   value: 90,
                                   message: 'Temperature too low',
@@ -336,9 +496,9 @@ function PatientProfle(){
                                 },
                               })}
                             />
-                            {errors.temperature && (
+                            {vitalsErrors.temperature && (
                               <p className="mt-1 text-xs text-red-500">
-                                {errors.temperature.message}
+                                {vitalsErrors.temperature.message}
                               </p>
                             )}
                           </div>
@@ -346,7 +506,7 @@ function PatientProfle(){
                         <div className="flex justify-end space-x-4">
                           <button
                             type="button"
-                            onClick={handleCancel}
+                            onClick={handleCancelVitals}
                             className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100"
                           >
                             Cancel
@@ -401,4 +561,4 @@ function PatientProfle(){
   );
 }
 
-export default PatientProfle; 
+export default PatientProfile;

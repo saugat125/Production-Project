@@ -1,4 +1,4 @@
-import { HashRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from '../Pages/home';
 import Contact from '../Pages/contact';
 import Prediction from '../Pages/prediction';
@@ -13,7 +13,7 @@ import ProtectedRoute from './ProtectedRoute';
 
 const Router=()=> {
   return (
-    <HashRouter>
+    <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/contact" element={<Contact />} />
@@ -29,7 +29,7 @@ const Router=()=> {
           <Route path="/appointment" element={<Appointment />} />
         </Route>
       </Routes>
-    </HashRouter>
+    </BrowserRouter>
   );
 }
 
