@@ -23,51 +23,32 @@ class DiseasePredictionView(APIView):
         top_disease = ml_result['predictions'][0]['disease']
         probability = ml_result['predictions'][0]['probability']
         
-        try:
-            disease_obj = Disease.objects.get(name__iexact=top_disease)
-            # Get the first recommended doctor or None if there are no matches
-            recommended_doctor = Doctor.objects.filter(
-                specialization=disease_obj.specialization
-            ).first()
-            
-            # Store the prediction record
-            prediction = PredictionRecord.objects.create(
-                user=request.user,
-                symptoms=json.dumps(symptoms),
-                predicted_disease_name=top_disease,  
-                predicted_disease=disease_obj, 
-                probability=probability,
-                recommended_doctor=recommended_doctor
-            )
-            
-            response_data = {
-                'predicted_disease': disease_obj.name,
-                'probability': probability,
-                'timestamp': prediction.timestamp.isoformat(),
-                'recommended_doctor': {
-                    'name': recommended_doctor.name,
-                    'specialization': recommended_doctor.get_specialization_display(),
-                } if recommended_doctor else None
-            }
-            return Response(response_data, status=status.HTTP_200_OK)
+        disease_obj = Disease.objects.get(name__iexact=top_disease)
+        # Get the first recommended doctor or None if there are no matches
+        recommended_doctor = Doctor.objects.filter(
+            specialization=disease_obj.specialization
+        ).first()
         
-        except Disease.DoesNotExist:
-            # Store prediction even if disease not in our DB
-            prediction = PredictionRecord.objects.create(
-                user=request.user,
-                symptoms=json.dumps(symptoms),
-                predicted_disease_name=top_disease, 
-                predicted_disease=None, 
-                probability=probability,
-                recommended_doctor=None
-            )
-            
-            return Response({
-                'predicted_disease': top_disease,
-                'probability': probability,  
-                'timestamp': prediction.timestamp.isoformat(),
-                'warning': "No specialist doctor available for this disease"
-            }, status=status.HTTP_200_OK)
+        # Store the prediction record
+        prediction = PredictionRecord.objects.create(
+            user=request.user,
+            symptoms=json.dumps(symptoms),
+            predicted_disease_name=top_disease,  
+            predicted_disease=disease_obj, 
+            probability=probability,
+            recommended_doctor=recommended_doctor
+        )
+        
+        response_data = {
+            'predicted_disease': ml_result['predictions'],
+            'timestamp': prediction.timestamp.isoformat(),
+            'recommended_doctor': {
+                'name': recommended_doctor.name,
+                'specialization': recommended_doctor.get_specialization_display(),
+            } if recommended_doctor else None
+        }
+        return Response(response_data, status=status.HTTP_200_OK)
+    
 
 
 
