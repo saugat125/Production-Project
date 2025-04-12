@@ -1,6 +1,6 @@
 from django.urls import path
-from .views import predict
+from prediction.views import DiseasePredictionView
 
 urlpatterns = [
-    path('predict/', predict, name='predict-disease'),
+    path('predict/', DiseasePredictionView.as_view(),name='predict'),
 ]

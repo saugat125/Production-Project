@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Disease, Doctor
+from .models import Disease, Doctor, PredictionRecord
 
 class DiseaseAdmin(admin.ModelAdmin):
     list_display = ('name', 'get_specialization_display')
@@ -11,3 +11,5 @@ class DiseaseAdmin(admin.ModelAdmin):
 admin.site.register(Disease, DiseaseAdmin)
 
 admin.site.register(Doctor)
+
+admin.site.register(PredictionRecord)

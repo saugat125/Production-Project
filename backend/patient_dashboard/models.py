@@ -5,7 +5,7 @@ from django.conf import settings
 
 class Vitals(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='vitals')
-    heart_rate = models.PositiveIntegerField(max_length=10, blank=True, null=True)
+    heart_rate = models.PositiveIntegerField(blank=True, null=True)
     blood_pressure = models.CharField(max_length=10 ,blank=True, null=True) 
     temperature = models.FloatField(max_length=10 ,blank=True, null=True)
     date_time = models.DateTimeField(auto_now_add=True)
