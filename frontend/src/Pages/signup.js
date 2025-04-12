@@ -29,6 +29,7 @@ export default function Signup() {
 
     localStorage.setItem('token', response.data.token.access);
     localStorage.setItem('refreshToken', response.data.token.refresh);
+    localStorage.setItem('name', response.data.name.split(" ")[0]);
     window.location.href = '/';
     }
     catch(err){

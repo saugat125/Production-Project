@@ -1,62 +1,66 @@
-import { useState } from "react"
-import { useForm } from "react-hook-form"
-import axios from "axios"
-import { Link } from "react-router-dom"
-import { getBaseURL } from "../apiConfig"
-import Navbar from "../Components/Navbar"
-import Footer from "../Components/Footer"
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { Link } from 'react-router-dom';
+import { getBaseURL } from '../apiConfig';
+import Navbar from '../Components/Navbar';
+import Footer from '../Components/Footer';
+import useAxios from '../Utils/axios';
 
 export default function Prediction() {
-  const [symptoms, setSymptoms] = useState([])
-  const [isLoading, setIsLoading] = useState(false)
-  const [predictedDisease, setPredictedDisease] = useState(null)
+  const [symptoms, setSymptoms] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [predictionResult, setPredictionResult] = useState(null);
   const [symptomError, setSymptomError] = useState('');
+  const api = useAxios();
 
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm()
+  } = useForm();
 
   const addSymptom = (data) => {
     if (data.symptom && !symptoms.includes(data.symptom)) {
-      setSymptoms([...symptoms, data.symptom])
-      reset({ symptom: "" })
+      setSymptoms([...symptoms, data.symptom]);
+      reset({ symptom: '' });
     }
-  }
+  };
 
   const removeSymptom = (symptomToRemove) => {
-    setSymptoms(symptoms.filter((symptom) => symptom !== symptomToRemove))
-  }
-
-  
+    setSymptoms(symptoms.filter((symptom) => symptom !== symptomToRemove));
+  };
 
   const predictDisease = async () => {
-
     setSymptomError('');
 
-    if (symptoms.length === 0) return
+    if (symptoms.length === 0) return;
 
-    setIsLoading(true)
+    setIsLoading(true);
 
     try {
-      // Replace with your actual API endpoint
-      const formattedSymptoms = symptoms.map(symptom => symptom.toLowerCase().replace(/\s+/g, "_"));
-      console.log("Formatted Symptoms:", formattedSymptoms)
-      const response = await axios.post(`${getBaseURL()}/predict/`, {
+      // Format symptoms for API
+      const formattedSymptoms = symptoms.map((symptom) =>
+        symptom.toLowerCase().replace(/\s+/g, '_')
+      );
+      console.log('Formatted Symptoms:', formattedSymptoms);
+
+      const response = await api.post(`${getBaseURL()}/predict/`, {
         symptoms: formattedSymptoms,
       });
-      console.log(response.data.predictions)
-      setPredictedDisease(response.data.predictions)
 
+      console.log('API Response:', response.data);
+      setPredictionResult(response.data);
+      console.log(predictionResult);
     } catch (error) {
-      setSymptomError(error.response?.data?.error || 'An error occurred while fetching predictions.')
-
+      setSymptomError(
+        error.response?.data?.error ||
+          'An error occurred while fetching predictions.'
+      );
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <div>
@@ -151,8 +155,7 @@ export default function Prediction() {
         </section>
 
         {/* Results */}
-        {/* Results */}
-        {predictedDisease && predictedDisease.length > 0 && (
+        {predictionResult && (
           <section className="result-section">
             <div className="mx-auto max-w-6xl px-4">
               <div className="title">
@@ -164,65 +167,79 @@ export default function Prediction() {
                     Potential Conditions
                   </h4>
 
-                  {predictedDisease.map((prediction, index) => (
-                    <div
-                      key={index}
-                      className="mb-4 border-b pb-4 last:border-b-0"
-                    >
-                      <div className="flex justify-between items-center">
-                        <span className="text-lg font-medium">
-                          {prediction.disease}
-                        </span>
-                        <span className="text-gray-700 font-medium">
-                          {(prediction.probability * 100).toFixed(0)}%
-                        </span>
-                      </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2.5 mt-2">
-                        <div
-                          className="bg-blue-600 h-2.5 rounded-full"
-                          style={{ width: `${prediction.probability * 100}%` }}
-                        ></div>
-                      </div>
+                  {predictionResult.predicted_disease &&
+                    predictionResult.predicted_disease.map(
+                      (prediction, index) => (
+                        <div key={index} className="mb-4 border-b pb-4">
+                          <div className="flex justify-between items-center">
+                            <span className="text-lg font-medium">
+                              {prediction.disease}
+                            </span>
+                            <span className="text-gray-700 font-medium">
+                              {(prediction.probability * 100).toFixed(0)}%
+                            </span>
+                          </div>
+                          <div className="w-full bg-gray-200 rounded-full h-2.5 mt-2">
+                            <div
+                              className="bg-blue-600 h-2.5 rounded-full"
+                              style={{
+                                width: `${prediction.probability * 100}%`,
+                              }}
+                            ></div>
+                          </div>
+                        </div>
+                      )
+                    )}
+
+                  {predictionResult.warning && (
+                    <div className="mt-4 p-3 bg-yellow-100 text-yellow-800 rounded-lg">
+                      <p>{predictionResult.warning}</p>
                     </div>
-                  ))}
+                  )}
                 </div>
               </div>
             </div>
           </section>
         )}
 
-        {/* Recommend Doctor - Placeholder as requested */}
-        <section className="doctor-section">
-          <div className="mx-auto max-w-6xl px-4">
-            <div className="title">
-              <h3 className="mb-6 text-2xl font-semibold">
-                Recommended Doctor
-              </h3>
-            </div>
-            <div className="mb-8">
-              <div className="w-full rounded-lg border bg-[linear-gradient(to_bottom,#EFF6FF,#FFFFFF)] p-6 shadow-lg md:p-8 lg:w-[60%] flex flex-col md:flex-row md:items-center md:justify-between">
-                <div className="flex items-center gap-4 md:gap-8 mb-4 md:mb-0">
-                  <div className="relative h-16 w-16">
-                    <img
-                      src="/placeholder.svg?height=64&width=64"
-                      alt="Doctor"
-                      width={64}
-                      height={64}
-                      className="rounded-full object-cover"
-                    />
+        {/* Recommended Doctor */}
+        {predictionResult && predictionResult.recommended_doctor && (
+          <section className="doctor-section">
+            <div className="mx-auto max-w-6xl px-4">
+              <div className="title">
+                <h3 className="mb-6 text-2xl font-semibold">
+                  Recommended Doctor
+                </h3>
+              </div>
+              <div className="mb-8">
+                <div className="w-full rounded-lg border bg-[linear-gradient(to_bottom,#EFF6FF,#FFFFFF)] p-6 shadow-lg md:p-8 lg:w-[60%] flex flex-col md:flex-row md:items-center md:justify-between">
+                  <div className="flex items-center gap-4 md:gap-8 mb-4 md:mb-0">
+                    <div className="relative h-16 w-16">
+                      <img
+                        src="/images/doctor.png"
+                        alt="Doctor"
+                        width={64}
+                        height={64}
+                        className="rounded-full object-cover"
+                      />
+                    </div>
+                    <div className="details">
+                      <h5 className="text-lg font-medium">
+                        {predictionResult.recommended_doctor.name}
+                      </h5>
+                      <p className="text-gray-600">
+                        {predictionResult.recommended_doctor.specialization}
+                      </p>
+                    </div>
                   </div>
-                  <div className="details">
-                    <h5 className="text-lg font-medium">Dr. John Morgan</h5>
-                    <p className="text-gray-600">Neurologist</p>
-                  </div>
+                  <button className="rounded-2xl bg-green-600 px-4 py-2 text-white hover:bg-green-700">
+                    <Link to="/appointment">Book an appointment</Link>
+                  </button>
                 </div>
-                <button className="rounded-2xl bg-green-600 px-4 py-2 text-white hover:bg-green-700">
-                  <Link href="/appointment">Book an appointment</Link>
-                </button>
               </div>
             </div>
-          </div>
-        </section>
+          </section>
+        )}
       </div>
 
       {/* Footer */}

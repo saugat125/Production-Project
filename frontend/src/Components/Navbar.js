@@ -2,10 +2,12 @@ import { Link } from "react-router-dom"
 
 function Navbar(){
     const isAuthenticated = localStorage.getItem('token')
+    const name = localStorage.getItem('name')
 
     const logout = () =>{
       localStorage.removeItem('token')
       localStorage.removeItem('refresh')
+      localStorage.removeItem('name')
       window.location.href = '/'
     }
 
@@ -41,7 +43,7 @@ function Navbar(){
                 <Link to="/patient-profile">
                   <div className="account flex gap-3 items-center">
                     <img src="/images/user.png" alt="" className="w-6 h-6" />
-                    <p className="text-black">Account</p>
+                    <p className="text-black">{name}</p>
                   </div>
                 </Link>
               </div>

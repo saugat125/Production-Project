@@ -20,6 +20,7 @@ export default function Login() {
 
       localStorage.setItem('token', response.data.token.access);
       localStorage.setItem('refreshToken', response.data.token.refresh);
+      localStorage.setItem('name', response.data.name.split(' ')[0]);
       window.location.href = "/"
     }
     
