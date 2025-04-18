@@ -15,7 +15,7 @@ function Navbar(){
       <div className="navigation">
         <div className="header flex justify-between mx-[100px] mt-[30px] items-center">
           <div className="header-item">
-            <h3>LOGO</h3>
+            <h4 className="font-bold">HealthVault</h4>
           </div>
           <div className="header-item flex gap-10">
             <Link to="/" className="nav-link">

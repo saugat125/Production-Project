@@ -1,35 +1,32 @@
-import { useForm } from "react-hook-form"
-import { Link } from "react-router-dom"
+import { useForm } from 'react-hook-form';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
-import { getBaseURL } from "../apiConfig";
-import { useState } from "react";
+import { getBaseURL } from '../apiConfig';
+import { useState } from 'react';
 
 export default function Login() {
-  const[error,setError] = useState(false)
+  const [error, setError] = useState(false);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm()
+  } = useForm();
 
   const onSubmit = async (data) => {
     // Handle login logic here
-    try{
-      const response = await axios.post(`${getBaseURL()}/user/login/`,data);
+    try {
+      const response = await axios.post(`${getBaseURL()}/user/login/`, data);
 
       localStorage.setItem('token', response.data.token.access);
       localStorage.setItem('refreshToken', response.data.token.refresh);
       localStorage.setItem('name', response.data.name.split(' ')[0]);
-      window.location.href = "/"
+      window.location.href = '/';
+    } catch (err) {
+      console.error(err);
+      setError(err.response.data.errors.non_field_errors[0]);
     }
-    
-    catch(err){
-      console.error(err)
-      setError(err.response.data.errors.non_field_errors[0])
-    }
-
-  }
+  };
 
   return (
     <div className="min-h-screen w-full bg-[linear-gradient(to_bottom,#b6ddf2,#f2f6fc)]">
@@ -64,24 +61,26 @@ export default function Login() {
           <div className="form">
             <form onSubmit={handleSubmit(onSubmit)}>
               {/* Email */}
-              <div className="mb-4 relative">
-                <div className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5">
-                  <img src="/images/email.png" alt="Email icon" />
+              <div className="mb-4">
+                <div className="relative">
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5">
+                    <img src="/images/email.png" alt="Email icon" />
+                  </div>
+                  <input
+                    type="email"
+                    placeholder="Email"
+                    className={`w-full rounded-lg border p-2 pl-12 ${
+                      errors.email ? 'border-red-500' : 'border-[#a3a3a3]'
+                    }`}
+                    {...register('email', {
+                      required: 'Email is required',
+                      pattern: {
+                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                        message: 'Invalid email address',
+                      },
+                    })}
+                  />
                 </div>
-                <input
-                  type="email"
-                  placeholder="Email"
-                  className={`w-full rounded-lg border p-2 pl-12 ${
-                    errors.email ? 'border-red-500' : 'border-[#a3a3a3]'
-                  }`}
-                  {...register('email', {
-                    required: 'Email is required',
-                    pattern: {
-                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                      message: 'Invalid email address',
-                    },
-                  })}
-                />
                 {errors.email && (
                   <p className="mt-1 text-xs text-red-500">
                     {errors.email.message}
@@ -90,25 +89,27 @@ export default function Login() {
               </div>
 
               {/* Password */}
-              <div className="mb-4 relative">
-                <div className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5">
-                  <img
-                    src="/images/password.png"
-                    alt="Password icon"
-                    width={20}
-                    height={20}
+              <div className="mb-4">
+                <div className="relative">
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5">
+                    <img
+                      src="/images/password.png"
+                      alt="Password icon"
+                      width={20}
+                      height={20}
+                    />
+                  </div>
+                  <input
+                    type="password"
+                    placeholder="Password"
+                    className={`w-full rounded-lg border p-2 pl-12 ${
+                      errors.password ? 'border-red-500' : 'border-[#a3a3a3]'
+                    }`}
+                    {...register('password', {
+                      required: 'Password is required',
+                    })}
                   />
                 </div>
-                <input
-                  type="password"
-                  placeholder="Password"
-                  className={`w-full rounded-lg border p-2 pl-12 ${
-                    errors.password ? 'border-red-500' : 'border-[#a3a3a3]'
-                  }`}
-                  {...register('password', {
-                    required: 'Password is required',
-                  })}
-                />
                 {errors.password && (
                   <p className="mt-1 text-xs text-red-500">
                     {errors.password.message}
