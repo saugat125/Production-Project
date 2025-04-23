@@ -46,3 +46,26 @@ class PredictionRecord(models.Model):
    
     def __str__(self):
         return f"{self.user.name} - {self.predicted_disease} at {self.timestamp}"
+    
+
+class Appointment(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='appointments')
+    doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE, related_name='appointments')
+
+    TIME_CHOICES = [
+        ('morning', 'Morning (9:00 AM - 12:00 PM)'),
+        ('afternoon', 'Afternoon (1:00 PM - 4:00 PM)'),
+        ('evening', 'Evening (5:00 PM - 8:00 PM)'),
+    ]
+
+    appointment_date = models.DateField()
+    preferred_time = models.CharField(max_length=20, choices=TIME_CHOICES)
+    message = models.TextField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)  
+
+    class Meta:
+        ordering = ['-appointment_date']  
+
+    def __str__(self):
+        return f"{self.user.name} with Dr. {self.doctor.name} on {self.appointment_date}"
+

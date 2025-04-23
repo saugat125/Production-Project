@@ -5,6 +5,7 @@ from .ml_model import predict_disease
 from .models import Disease, Doctor, PredictionRecord
 from rest_framework.permissions import IsAuthenticated
 import json
+from .serializers import AppointmentSerializer
 
 # Create your views here.
 
@@ -48,6 +49,30 @@ class DiseasePredictionView(APIView):
             } if recommended_doctor else None
         }
         return Response(response_data, status=status.HTTP_200_OK)
+    
+
+class AppointmentView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, format=None):
+        """Create a new appointment for the current user"""
+        serializer = AppointmentSerializer(data=request.data)
+        if serializer.is_valid():
+            # Associate the appointment with the current user
+            appointment = serializer.save(user=request.user)
+            
+            # Return the created appointment details
+            response_data = {
+                'id': appointment.id,
+                'doctor_name': appointment.doctor.name,
+                'doctor_specialization': appointment.doctor.specialization,
+                'appointment_date': appointment.appointment_date,
+                'preferred_time': appointment.get_preferred_time_display(),
+                'message': appointment.message,
+                'created_at': appointment.created_at
+            }
+            return Response(response_data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 
 
