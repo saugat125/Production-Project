@@ -39,11 +39,11 @@ class DiseasePredictionView(APIView):
             probability=probability,
             recommended_doctor=recommended_doctor
         )
-        
         response_data = {
             'predicted_disease': ml_result['predictions'],
             'timestamp': prediction.timestamp.isoformat(),
             'recommended_doctor': {
+                'id' : recommended_doctor.id,
                 'name': recommended_doctor.name,
                 'specialization': recommended_doctor.get_specialization_display(),
             } if recommended_doctor else None
