@@ -232,8 +232,13 @@ export default function Prediction() {
                       </p>
                     </div>
                   </div>
+
                   <button className="rounded-2xl bg-green-600 px-4 py-2 text-white hover:bg-green-700">
-                    <Link to="/appointment">Book an appointment</Link>
+                    <Link
+                      to={`/appointment?doctorId=${predictionResult.recommended_doctor.id}&doctorName=${predictionResult.recommended_doctor.name}&doctorSpecialization=${predictionResult.recommended_doctor.specialization}`}
+                    >
+                      Book an appointment
+                    </Link>
                   </button>
                 </div>
               </div>
