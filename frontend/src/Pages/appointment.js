@@ -227,7 +227,7 @@ function Appointment() {
                             />
                           </div>
                           <div>
-                            <p className="font-medium">Dr. {doctor.name}</p>
+                            <p className="font-medium">{doctor.name}</p>
                             <p className="text-sm text-gray-600">
                               {doctor.specialization}
                             </p>
