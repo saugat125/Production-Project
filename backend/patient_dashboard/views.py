@@ -5,6 +5,8 @@ from rest_framework.permissions import IsAuthenticated
 from .models import Vitals
 from authentication.renderers import UserRenderer
 from .serializers import VitalsSerializer
+from prediction.models import Appointment
+from .serializers import AppointmentListSerializer
 
 # Create your views here.
 
@@ -41,3 +43,32 @@ class VitalsUpdateView(APIView):
             return Response({'msg':'Vitals Updated Successfully'},status=status.HTTP_200_OK)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+class AppointmentDisplayView(APIView):
+    renderer_classes = [UserRenderer]
+    permission_classes = [IsAuthenticated]
+
+    def get(self,request,format=None):
+        """Get all appointments for the current user"""
+        appointments = Appointment.objects.filter(user=request.user).select_related('doctor')
+        serializer = AppointmentListSerializer(appointments, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+class CancelAppointmentView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, appointment_id, format=None):
+        try:
+            appointment = Appointment.objects.get(id=appointment_id, user=request.user)
+            appointment.delete()
+            return Response(
+                {"message": "Appointment cancelled successfully."},
+                status = status.HTTP_200_OK
+            )
+        except Appointment.DoesNotExist:
+            return Response(
+                {"error": "Appointment not found."},
+                status = status.HTTP_404_NOT_FOUND
+            )
