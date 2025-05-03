@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Appointment
 from datetime import datetime
+from prediction.models import Doctor
 
 class AppointmentSerializer(serializers.ModelSerializer):
     class Meta:
@@ -12,3 +13,9 @@ class AppointmentSerializer(serializers.ModelSerializer):
         if value < datetime.now().date():
             raise serializers.ValidationError("Appointment date cannot be in the past.")
         return value
+    
+
+class DoctorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Doctor
+        fields = ['id', 'name', 'specialization']

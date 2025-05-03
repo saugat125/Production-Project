@@ -5,7 +5,7 @@ from .ml_model import predict_disease
 from .models import Disease, Doctor, PredictionRecord
 from rest_framework.permissions import IsAuthenticated
 import json
-from .serializers import AppointmentSerializer
+from .serializers import AppointmentSerializer, DoctorSerializer
 
 # Create your views here.
 
@@ -50,7 +50,8 @@ class DiseasePredictionView(APIView):
         }
         return Response(response_data, status=status.HTTP_200_OK)
     
-
+    
+# Booking Appointment
 class AppointmentView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -75,5 +76,22 @@ class AppointmentView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 
+# List all doctors
+class DoctorListView(APIView):
 
+    def get(self, request, format=None):
+        # Get optional specialization filter from query params
+        specialization = request.query_params.get('specialization')
+        
+        # Filter doctors if specialization is provided
+        if specialization:
+            doctors = Doctor.objects.filter(specialization=specialization)
+        else:
+            doctors = Doctor.objects.all()
+        
+        # Serialize the data
+        serializer = DoctorSerializer(doctors, many=True)
+        
+        # Return the response
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
