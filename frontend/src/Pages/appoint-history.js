@@ -102,28 +102,34 @@ function AppointmentHistory() {
                     appointments.map((appointment) => (
                       <div
                         key={appointment.id}
-                        className="item flex items-center gap-28"
+                        className="item flex justify-between items-center gap-4 p-4 rounded-lg shadow-sm border"
                       >
-                        <div className="flex items-center">
+                        {/* Doctor Info - Fixed width */}
+                        <div className="flex items-center w-1/3 min-w-[200px]">
                           <div className="logo w-12 h-12 bg-white rounded-full flex items-center justify-center mr-4 border">
-                            <img src="/images/history.png" alt="Appointment" />
+                            <img
+                              src="/images/history.png"
+                              alt="Appointment"
+                              className="w-6 h-6"
+                            />
                           </div>
                           <div className="details">
-                            <p className="font-medium">
+                            <p className="font-medium truncate">
                               {appointment.doctor_specialization}
                             </p>
-                            <p className="text-gray-600 text-sm">
+                            <p className="text-gray-600 text-sm truncate">
                               {appointment.doctor_name}
                             </p>
                           </div>
                         </div>
 
-                        <div className="time text-gray-700 flex items-center gap-2">
-                          <p className="font-medium">
+                        {/* Time/Date - Fixed width */}
+                        <div className="time text-gray-700 flex items-center gap-2 w-1/3 min-w-[400px] justify-center">
+                          <p className="font-medium truncate">
                             {appointment.preferred_time}
                           </p>
                           <span>•</span>
-                          <p className="text-gray-600 text-sm">
+                          <p className="text-gray-600 text-sm truncate">
                             {format(
                               new Date(appointment.appointment_date),
                               'd MMMM, yyyy'
@@ -131,24 +137,27 @@ function AppointmentHistory() {
                           </p>
                         </div>
 
-                        <button
-                          onClick={() =>
-                            handleCancelAppointment(appointment.id)
-                          }
-                          disabled={cancelAppointmentMutation.isLoading}
-                          className="border border-[#2563EB] text-[#2563EB] rounded-3xl px-6 py-1 text-sm flex items-center space-x-1 hover:bg-blue-50 transition-colors disabled:opacity-50"
-                        >
-                          <span className="font-semibold">
-                            {cancelAppointmentMutation.isLoading
-                              ? 'Cancelling...'
-                              : 'Cancel'}
-                          </span>
-                        </button>
+                        {/* Cancel Button - Fixed width */}
+                        <div className="w-1/3 min-w-[120px] flex justify-end">
+                          <button
+                            onClick={() =>
+                              handleCancelAppointment(appointment.id)
+                            }
+                            disabled={cancelAppointmentMutation.isLoading}
+                            className="border border-[#2563EB] text-[#2563EB] rounded-3xl px-6 py-1 text-sm flex items-center space-x-1 hover:bg-blue-50 transition-colors disabled:opacity-50"
+                          >
+                            <span className="font-semibold">
+                              {cancelAppointmentMutation.isLoading
+                                ? 'Cancelling...'
+                                : 'Cancel'}
+                            </span>
+                          </button>
+                        </div>
                       </div>
                     ))
                   ) : (
-                    <p className="text-gray-500 text-center py-10">
-                      No appointments found.
+                    <p className="text-center text-gray-500">
+                      No appointments found
                     </p>
                   )}
                 </div>

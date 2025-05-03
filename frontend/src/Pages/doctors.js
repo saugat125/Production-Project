@@ -1,8 +1,54 @@
 import Navbar from '../Components/Navbar';
 import Footer from '../Components/Footer';
 import { Link } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import axios from 'axios';
+import { getBaseURL } from '../apiConfig';
+import { useState } from 'react';
 
 function Doctors() {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const {
+    data: doctors = [],
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ['doctors', searchQuery],
+    queryFn: async () => {
+      const response = await axios.get(
+        `${getBaseURL()}/doctors/?search=${searchQuery}`
+      );
+      return response.data;
+    },
+    keepPreviousData: true,
+  });
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      setSearchQuery(searchTerm); // Only update searchQuery on Enter
+    }
+  };
+
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value); // Update input without triggering search
+  };
+
+  if (isLoading)
+    return (
+      <div className="text-center py-20">
+        <p>Loading doctors...</p>
+      </div>
+    );
+
+  if (error)
+    return (
+      <div className="text-center py-20 text-red-500">
+        Error: {error.message}
+      </div>
+    );
+
   return (
     <div className="doctors-page">
       <div className="nav">
@@ -29,22 +75,22 @@ function Doctors() {
             </div>
             <input
               className="block w-[50%] m-auto p-3 pl-10 text-sm border border-gray-400 rounded-lg"
-              placeholder="Search"
+              placeholder="Search doctors by name or specialty"
+              value={searchTerm}
+              onChange={handleSearchChange}
+              onKeyDown={handleKeyDown}
             />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-12">
-            {/* First row of doctors */}
-            <DoctorCard />
-            <DoctorCard />
-            <DoctorCard />
-            <DoctorCard />
-
-            {/* Second row of doctors */}
-            <DoctorCard />
-            <DoctorCard />
-            <DoctorCard />
-            <DoctorCard />
+            {doctors.map((doctor) => (
+              <DoctorCard
+                key={doctor.id}
+                name={doctor.name}
+                specialization={doctor.specialization}
+                id={doctor.id}
+              />
+            ))}
           </div>
         </div>
       </section>
@@ -57,43 +103,53 @@ function Doctors() {
   );
 }
 
-function DoctorCard() {
+function DoctorCard({ name, specialization, id }) {
   return (
     <div className="doctor-card bg-white p-10 rounded-lg flex flex-col items-center text-center shadow-lg border">
       <div className="image-container w-20 h-20 mb-6">
-        <img src="/images/doctor.png" alt="" className="w-full h-full object-cover rounded-full"/>
+        <img
+          src="/images/doctor.png"
+          alt={`Dr. ${name}`}
+          className="w-full h-full object-cover rounded-full"
+        />
       </div>
       <div className="text-container">
-        <h3 className="font-bold text-lg mb-2">Dr. John Morgan</h3>
-        <p className="text-sm text-gray-600 mb-6">Neurologist</p>
+        <h3 className="font-bold text-lg mb-2">{name}</h3>
+        <p className="text-sm text-gray-600 mb-6 capitalize">
+          {specialization.toLowerCase()}
+        </p>
       </div>
 
-      <div className=" social flex space-x-3 mb-6">
+      <div className="social flex space-x-3 mb-6">
         <a
           href="facebook.com"
           aria-label="Facebook"
           className="text-gray-600 hover:text-gray-800"
         >
-          <img src="/images/facebook.png" alt="" className="w-5 h-5" />
+          <img src="/images/facebook.png" alt="Facebook" className="w-5 h-5" />
         </a>
         <a
           href="linkedin.com"
           aria-label="LinkedIn"
           className="text-gray-600 hover:text-gray-800"
         >
-          <img src="/images/linkedin.png" alt="" className="w-5 h-5" />
+          <img src="/images/linkedin.png" alt="LinkedIn" className="w-5 h-5" />
         </a>
         <a
           href="twitter.com"
           aria-label="Twitter"
           className="text-gray-600 hover:text-gray-800"
         >
-          <img src="/images/insta.png" alt="" className="w-5 h-5" />
+          <img src="/images/insta.png" alt="Instagram" className="w-5 h-5" />
         </a>
       </div>
 
       <span className="appointment text-sm font-bold text-[#15803D]">
-        <Link to="/appointment">Appointment</Link>
+        <Link
+          to={`/appointment?doctorId=${id}&doctorName=${name}&doctorSpecialization=${specialization}`}
+        >
+          Appointment
+        </Link>
       </span>
     </div>
   );
