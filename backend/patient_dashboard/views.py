@@ -5,7 +5,8 @@ from rest_framework.permissions import IsAuthenticated
 from .models import Vitals
 from authentication.renderers import UserRenderer
 from .serializers import VitalsSerializer
-from prediction.models import Appointment
+from prediction.models import Appointment, PredictionRecord
+from .serializers import PredictionRecordSerializer
 from .serializers import AppointmentListSerializer
 
 # Create your views here.
@@ -72,3 +73,26 @@ class CancelAppointmentView(APIView):
                 {"error": "Appointment not found."},
                 status = status.HTTP_404_NOT_FOUND
             )
+        
+
+class PredictionHistoryView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request, format=None):
+        try:
+            # Get records for the current user, ordered by most recent
+            records = PredictionRecord.objects.filter(user=request.user).order_by('-timestamp')
+            
+            # Serialize the data
+            serializer = PredictionRecordSerializer(records, many=True)
+            
+            return Response({
+                'success': True,
+                'data': serializer.data
+            }, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            return Response({
+                'success': False,
+                'message': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

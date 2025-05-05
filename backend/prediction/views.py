@@ -6,6 +6,7 @@ from .models import Disease, Doctor, PredictionRecord
 from rest_framework.permissions import IsAuthenticated
 import json
 from .serializers import AppointmentSerializer, DoctorSerializer
+from django.db.models import Q
 
 # Create your views here.
 
@@ -78,16 +79,26 @@ class AppointmentView(APIView):
 
 # List all doctors
 class DoctorListView(APIView):
-
     def get(self, request, format=None):
-        # Get optional specialization filter from query params
+        # Get query parameters
         specialization = request.query_params.get('specialization')
+        search_query = request.query_params.get('search')
         
-        # Filter doctors if specialization is provided
+        # Start with all doctors
+        doctors = Doctor.objects.all()
+        
+        # Apply filters if provided
         if specialization:
-            doctors = Doctor.objects.filter(specialization=specialization)
-        else:
-            doctors = Doctor.objects.all()
+            doctors = doctors.filter(specialization=specialization)
+        
+        if search_query:
+            doctors = doctors.filter(
+                Q(name__icontains=search_query) |
+                Q(specialization__icontains=search_query)
+            )
+        
+        # Order results
+        doctors = doctors.order_by('name')
         
         # Serialize the data
         serializer = DoctorSerializer(doctors, many=True)
