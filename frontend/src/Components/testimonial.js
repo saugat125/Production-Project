@@ -1,4 +1,3 @@
-'use client';
 
 import { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
@@ -41,7 +40,7 @@ function TestimonialsSection() {
   };
 
   return (
-    <div className="py-16 bg-white">
+    <div id="review" className="py-16 bg-white">
       <div className="custom-container">
         <h2 className="text-3xl font-bold text-center mb-12 text-[#1E40AF]">
           What Our Users Say

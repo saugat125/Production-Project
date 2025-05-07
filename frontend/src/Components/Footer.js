@@ -19,24 +19,24 @@ function Footer(){
                   <Link to="/" className="nav-link">
                     Home
                   </Link>
-                  <Link to="/" className="nav-link">
+                  <a href="/#about-us" className="nav-link">
                     About Us
-                  </Link>
-                  <Link to="/" className="nav-link">
+                  </a>
+                  <Link to="/contact" className="nav-link">
                     Contact Us
                   </Link>
-                  <Link to="/" className="nav-link">
+                  <a href="/#features" className="nav-link">
                     Features
-                  </Link>
+                  </a>
                 </div>
                 <div className="column flex flex-col gap-4">
-                  <Link to="/" className="nav-link">
+                  <a href="/#review" className="nav-link">
                     Review
-                  </Link>
-                  <Link to="/" className="nav-link">
+                  </a>
+                  <Link to="/prediction" className="nav-link">
                     Symptom Checker
                   </Link>
-                  <Link to="/" className="nav-link">
+                  <Link to="/doctors" className="nav-link">
                     Doctors
                   </Link>
                 </div>
@@ -45,7 +45,7 @@ function Footer(){
 
             <div className="bottom-footer mt-16 pb-12 mr-5 flex justify-between items-end">
               <div className="copyright">
-                <p>© 2025 Health. All rights reserved.</p>
+                <p>© 2025 HealthVault. All rights reserved.</p>
               </div>
               <div className="social">
                 <h5 className="mb-8">Social</h5>

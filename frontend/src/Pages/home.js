@@ -31,7 +31,7 @@ function Home() {
                   </Link>
                 </button>
                 <button class="border border-gray-800 text-gray-800 px-6 py-2 text-[14px] font-bold">
-                  Learn More
+                  <a href="#about-us">Learn More</a>
                 </button>
               </div>
             </div>
@@ -53,7 +53,7 @@ function Home() {
       </section>
 
       {/* Features */}
-      <section className="features-section">
+      <section id="features" className="features-section">
         <div className="custom-container">
           <div className="head text-center">
             <h2 className="w-[40%] m-auto text-[#1E40AF]">
@@ -123,7 +123,7 @@ function Home() {
       </section>
 
       {/* About */}
-      <section className="about-section">
+      <section id="about-us" className="about-section">
         <div className="custom-container">
           <div className="about-container flex gap-[90px] justify-between mb-[100px]">
             <div className="text w-[55%]">

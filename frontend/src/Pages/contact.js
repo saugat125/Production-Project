@@ -25,7 +25,7 @@ function Contact() {
                 </p>
               </div>
               <div className="details">
-                <p className="mb-2">example@gmail.com</p>
+                <p className="mb-2">healthvault@gmail.com</p>
                 <p className="mb-8">+977-9800000000</p>
               </div>
               <div className="logo flex gap-6">
