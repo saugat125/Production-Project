@@ -7,6 +7,50 @@ from rest_framework.permissions import IsAuthenticated
 import json
 from .serializers import AppointmentSerializer, DoctorSerializer
 from django.db.models import Q
+import google.generativeai as genai
+from django.conf import settings
+
+# Disease information from gemini api
+genai.configure(api_key=settings.GEMINI_API_KEY)
+
+def get_disease_info(disease_name):
+    """Fetch disease info from Gemini API"""
+    model = genai.GenerativeModel('gemini-1.5-flash-latest')
+    prompt = f"""Provide medical information about {disease_name} as a pure JSON object with exactly these 3 fields:
+        1. "description": A 1-2 sentence overview of the disease
+        2. "common_symptoms": An array of 5-6 most common symptoms
+        3. "prevention_tips": An array of 5-6 prevention strategies
+
+        Important requirements:
+        - Return ONLY the raw JSON object 
+        - Do NOT include any Markdown formatting (no ```json or ```)
+        - Do NOT include any explanatory text
+        - Maintain this exact structure:
+        {{
+            "description": "",
+            "common_symptoms": [],
+            "prevention_tips": []
+        }}
+
+        Example output for "Migraine":
+        {{
+            "description": "Migraine is...",
+            "common_symptoms": ["Symptom 1", "Symptom 2"],
+            "prevention_tips": ["Tip 1", "Tip 2"]
+        }}"""
+    
+    try:
+        response = model.generate_content(prompt)
+
+        if not response.text:
+            print(f"Empty response from Gemini for {disease_name}")
+            return None
+        print("Raw Gemini response:", response.text)
+        return response.text
+    except Exception as e:
+        print(f"Gemini API error for {disease_name}: {str(e)}")
+        return None
+    
 
 # Create your views here.
 
@@ -31,6 +75,14 @@ class DiseasePredictionView(APIView):
             specialization=disease_obj.specialization
         ).first()
         
+        # Get disease info from Gemini API
+        disease_info = get_disease_info(top_disease)
+        print("Disease info from Gemini:", disease_info)
+        try:
+            disease_info = json.loads(disease_info) if disease_info else None
+        except json.JSONDecodeError:
+            disease_info = None
+
         # Store the prediction record
         prediction = PredictionRecord.objects.create(
             user=request.user,
@@ -42,6 +94,7 @@ class DiseasePredictionView(APIView):
         )
         response_data = {
             'predicted_disease': ml_result['predictions'],
+            'info': disease_info,
             'timestamp': prediction.timestamp.isoformat(),
             'recommended_doctor': {
                 'id' : recommended_doctor.id,
@@ -105,4 +158,7 @@ class DoctorListView(APIView):
         
         # Return the response
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+
 
