@@ -191,6 +191,51 @@ export default function Prediction() {
                       )
                     )}
 
+                  {/* Disease Information Section */}
+                  {predictionResult.info && (
+                    <div className="mt-16 pt-10 border-t">
+                      <h3 className="text-2xl font-bold mb-10 text-[#1E40AF]">
+                        About {predictionResult.predicted_disease[0].disease}
+                      </h3>
+
+                      {/* Description */}
+                      <div className="mb-6">
+                        <h5 className="font-semibold mb-2">Description</h5>
+                        <p className="text-gray-700">
+                          {predictionResult.info.description}
+                        </p>
+                      </div>
+
+                      {/* Symptoms */}
+                      <div className="mb-6">
+                        <h5 className="font-semibold mb-2">Common Symptoms</h5>
+                        <ul className="list-disc pl-5 space-y-1">
+                          {predictionResult.info.common_symptoms.map(
+                            (symptom, index) => (
+                              <li key={index} className="text-gray-700">
+                                {symptom}
+                              </li>
+                            )
+                          )}
+                        </ul>
+                      </div>
+
+                      {/* Prevention Tips */}
+                      <div className="mb-6">
+                        <h5 className="font-semibold mb-2">Prevention Tips</h5>
+                        <ul className="list-disc pl-5 space-y-1">
+                          {predictionResult.info.prevention_tips.map(
+                            (tip, index) => (
+                              <li key={index} className="text-gray-700">
+                                {tip}
+                              </li>
+                            )
+                          )}
+                        </ul>
+                      </div>
+                    </div>
+                  )}
+
                   {predictionResult.warning && (
                     <div className="mt-4 p-3 bg-yellow-100 text-yellow-800 rounded-lg">
                       <p>{predictionResult.warning}</p>
