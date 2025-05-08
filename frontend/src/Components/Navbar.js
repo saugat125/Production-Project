@@ -22,24 +22,46 @@ function Navbar(){
             </h4>
           </div>
           <div className="header-item flex gap-10">
-            <Link to="/" className="nav-link">
+            <Link
+              to="/"
+              className="nav-link hover:text-[#1E40AF] transition-all-duration-300"
+            >
               Home
             </Link>
-            <Link to="/contact" className="nav-link">
+            <Link
+              to="/contact"
+              className="nav-link hover:text-[#1E40AF] transition-all-duration-300"
+            >
               Contact Us
             </Link>
-            <Link to="/prediction" className="nav-link">
+            <Link
+              to="/prediction"
+              className="nav-link hover:text-[#1E40AF] transition-all-duration-300"
+            >
               Symptom Checker
             </Link>
-            <Link to="/doctors" className="nav-link">
+            <Link
+              to="/doctors"
+              className="nav-link hover:text-[#1E40AF] transition-all-duration-300"
+            >
               Doctors
             </Link>
           </div>
 
           {!isAuthenticated ? (
             <div className="header-item flex gap-10">
-              <Link to="/signup">Signup</Link>
-              <Link to="/login">Login</Link>
+              <Link
+                to="/signup"
+                className="hover:text-[#1E40AF] transition-all-duration-300"
+              >
+                Signup
+              </Link>
+              <Link
+                to="/login"
+                className="hover:text-[#1E40AF] transition-all-duration-300"
+              >
+                Login
+              </Link>
             </div>
           ) : (
             <div className="header-item flex gap-8 items-center">

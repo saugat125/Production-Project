@@ -16,27 +16,48 @@ function Footer(){
               </div>
               <div className="right-footer flex gap-24 mr-5">
                 <div className="column flex flex-col gap-4">
-                  <Link to="/" className="nav-link">
+                  <Link
+                    to="/"
+                    className="nav-link hover:text-[#1E40AF] transition-all-duration-300"
+                  >
                     Home
                   </Link>
-                  <a href="/#about-us" className="nav-link">
+                  <a
+                    href="/#about-us"
+                    className="nav-link hover:text-[#1E40AF] transition-all-duration-300"
+                  >
                     About Us
                   </a>
-                  <Link to="/contact" className="nav-link">
+                  <Link
+                    to="/contact"
+                    className="nav-link hover:text-[#1E40AF] transition-all-duration-300"
+                  >
                     Contact Us
                   </Link>
-                  <a href="/#features" className="nav-link">
+                  <a
+                    href="/#features"
+                    className="nav-link hover:text-[#1E40AF] transition-all-duration-300"
+                  >
                     Features
                   </a>
                 </div>
                 <div className="column flex flex-col gap-4">
-                  <a href="/#review" className="nav-link">
+                  <a
+                    href="/#review"
+                    className="nav-link hover:text-[#1E40AF] transition-all-duration-300"
+                  >
                     Review
                   </a>
-                  <Link to="/prediction" className="nav-link">
+                  <Link
+                    to="/prediction"
+                    className="nav-link hover:text-[#1E40AF] transition-all-duration-300"
+                  >
                     Symptom Checker
                   </Link>
-                  <Link to="/doctors" className="nav-link">
+                  <Link
+                    to="/doctors"
+                    className="nav-link hover:text-[#1E40AF] transition-all-duration-300"
+                  >
                     Doctors
                   </Link>
                 </div>

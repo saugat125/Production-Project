@@ -25,12 +25,12 @@ function Home() {
                 manage your health seamlessly.
               </p>
               <div className="buttons flex space-x-4">
-                <button class="bg-[#2563EB] text-white px-6 py-2 text-[14px] font-bold">
+                <button class="bg-[#2563EB] text-white px-6 py-2 text-[14px] font-bold hover:shadow-md transition-all duration-300">
                   <Link to="/prediction" className="nav-link">
                     Get Started
                   </Link>
                 </button>
-                <button class="border border-gray-800 text-gray-800 px-6 py-2 text-[14px] font-bold">
+                <button class="border border-gray-800 text-gray-800 px-6 py-2 text-[14px] font-bold hover:shadow-md transition-all duration-300">
                   <a href="#about-us">Learn More</a>
                 </button>
               </div>
@@ -129,19 +129,26 @@ function Home() {
             <div className="text w-[55%]">
               <h2 className="text-[#1E40AF] mb-[40px]">About Us</h2>
               <p>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-                enim ad minim veniam, quis nostrud exercitation ullamco laboris
-                nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor
-                in reprehenderit in voluptate velit esse cillum dolore eu fugiat
-                nulla pariatur. Excepteur sint occaecat cupidatat non proident,
-                sunt in culpa qui officia deserunt mollit anim id est laborum.
+                At HealthVault, we believe in transforming healthcare through
+                the power of technology. Our platform combines intelligent
+                disease prediction, secure electronic health record (EHR)
+                management, and personalized doctor recommendations to provide
+                users with timely, reliable, and accessible medical support.
+                Using advanced machine learning models, we enable users to input
+                their symptoms and receive insights into potential health
+                conditions, along with guidance on finding the right medical
+                specialists.
               </p>
               <br />
               <p>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-                enim ad minim veniam, quis nostrud exercitation ullamco laboris
+                Our mission is to bridge the gap between patients and healthcare
+                professionals by simplifying the diagnostic journey and
+                promoting proactive care. Whether you're managing your personal
+                health or assisting a loved one, our intuitive and secure system
+                is designed to help you make informed decisions. We are
+                committed to innovation, privacy, and usability—ensuring that
+                our solution is not only smart but also trustworthy and easy to
+                use.
               </p>
             </div>
             <div className="image-container w-[45%]">
