@@ -196,7 +196,7 @@ function PatientProfile() {
                       <div className="left-container p-10 pr-20 border-b md:border-b-0 md:border-r border-gray-300 flex flex-col items-center md:items-start">
                         <div className="image-container w-20 h-20 mb-6">
                           <img
-                            src="/images/doctor.png"
+                            src="/images/userpic.png"
                             alt=""
                             className="w-full h-full object-cover rounded-full"
                           />

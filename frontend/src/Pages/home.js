@@ -45,7 +45,7 @@ function Home() {
       <section className="banner-section px-4 md:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="image-container mt-10 md:mt-[40px] lg:mt-[70px] mb-16 md:mb-24 lg:mb-[160px]">
-            <img
+            <img 
               src="/images/banner.jpg"
               alt="banner"
               className="w-full h-auto md:h-[400px] lg:h-[570px] object-cover rounded-lg"
