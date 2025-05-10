@@ -15,12 +15,22 @@ class VitalsView(APIView):
     renderer_classes = [UserRenderer]
     permission_classes = [IsAuthenticated]
 
-    def get(self,request,format=None):
+    def get(self, request, format=None):
         vitals = Vitals.objects.filter(user=request.user).order_by('-date_time').first()
+        
         if vitals:
             serializer = VitalsSerializer(vitals)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response({"errors": "No vitals found"}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            # Return default empty values
+            serializer = VitalsSerializer(data={
+                'temperature': None,
+                'blood_pressure': None,
+                'heart_rate': None,
+                'date_time': None
+            })
+            serializer.is_valid()  # Make sure to call this
+        
+        return Response(serializer.data, status=status.HTTP_200_OK)
     
 
 class VitalsUpdateView(APIView):
